@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NOKOS SMSCode — Nomor Virtual Murah</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%);min-height:100vh}
+.card{background:rgba(30,41,59,.8);backdrop-filter:blur(12px);border:1px solid rgba(148,163,184,.1)}
+.btn-primary{background:linear-gradient(135deg,#0ea5e9,#0284c7)}
+.btn-success{background:linear-gradient(135deg,#10b981,#059669)}
+.otp-box{letter-spacing:.3em}
+.pulse{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+</style>
+</head>
+<body class="text-slate-200 font-sans antialiased">
+<header class="border-b border-slate-700/50 sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md">
+<div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center font-bold text-white text-lg">N</div>
+<div>
+<h1 class="text-xl font-bold text-white">NOKOS <span class="text-sky-400">SMSCode</span></h1>
+<p class="text-xs text-slate-400">Nomor Virtual Instant</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button onclick="switchTab('deposit')" class="btn-success text-sm px-4 py-2 rounded-xl font-medium text-white">+ Deposit</button>
+<div id="balanceBox" class="card px-4 py-2 rounded-xl flex items-center gap-2">
+<span class="text-slate-400 text-sm">Saldo</span>
+<span id="balanceAmount" class="font-semibold text-emerald-400">...</span>
+<button onclick="loadBalance()" class="text-slate-500 hover:text-sky-400" title="Refresh">↻</button>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-6xl mx-auto px-4 py-8">
+<div class="flex gap-2 mb-6 overflow-x-auto pb-1">
+<button onclick="switchTab('buy')" id="tab-buy" class="tab-btn px-5 py-2.5 rounded-xl font-medium text-sm bg-sky-600 text-white">Beli Nomor</button>
+<button onclick="switchTab('deposit')" id="tab-deposit" class="tab-btn px-5 py-2.5 rounded-xl font-medium text-sm text-slate-400 hover:text-white hover:bg-slate-700/50">Deposit</button>
+<button onclick="switchTab('orders')" id="tab-orders" class="tab-btn px-5 py-2.5 rounded-xl font-medium text-sm text-slate-400 hover:text-white hover:bg-slate-700/50">Pesanan Aktif</button>
+<button onclick="switchTab('history')" id="tab-history" class="tab-btn px-5 py-2.5 rounded-xl font-medium text-sm text-slate-400 hover:text-white hover:bg-slate-700/50">Riwayat</button>
+</div>
+<div id="panel-buy" class="space-y-6">
+<div class="card rounded-2xl p-5">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div>
+<label class="block text-sm text-slate-400 mb-1.5">Negara</label>
+<select id="countrySelect" onchange="onCountryChange()" class="w-full bg-slate-800 border border-slate-600 rounded-xl px-4 py-2.5 text-white">
+<option value="">Loading...</option>
+</select>
+</div>
+<div>
+<label class="block text-sm text-slate-400 mb-1.5">Layanan / Platform</label>
+<select id="serviceSelect" onchange="loadProducts()" class="w-full bg-slate-800 border border-slate-600 rounded-xl px-4 py-2.5 text-white">
+<option value="">Pilih negara dulu</option>
+</select>
+</div>
+<div class="flex items-end">
+<button onclick="loadProducts()" class="btn-primary w-full py-2.5 rounded-xl font-medium text-white">Cari Nomor</button>
+</div>
+</div>
+</div>
+<div id="productsArea">
+<div class="text-center py-16 text-slate-500"><p>Pilih negara & layanan untuk melihat stok nomor</p></div>
+</div>
+</div>
+<div id="panel-deposit" class="hidden space-y-6">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<div class="card rounded-2xl p-6">
+<h2 class="text-lg font-semibold text-white mb-1">Scan QRIS untuk Deposit</h2>
+<p class="text-sm text-slate-400 mb-4">TOKO RYUZE • DANA Bisnis</p>
+<div class="bg-white rounded-2xl p-4 mx-auto max-w-xs shadow-xl">
+<img src="/qris-deposit.jpg" alt="QRIS Deposit TOKO RYUZE" class="w-full rounded-xl"/>
+</div>
+<div class="mt-4 text-center space-y-1">
+<p class="text-sm text-slate-300 font-medium">TOKO RYUZE</p>
+<p class="text-xs text-slate-500">NMID: ID1025406674966</p>
+<p class="text-xs text-emerald-400 mt-2">Minimal deposit: Rp 10.000</p>
+</div>
+<div class="mt-5 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30">
+<p class="text-sm text-amber-300 font-medium mb-2">Cara Deposit:</p>
+<ol class="text-xs text-slate-300 space-y-1.5 list-decimal list-inside">
+<li>Scan QRIS di atas menggunakan e-wallet / m-banking</li>
+<li>Masukkan nominal deposit</li>
+<li>Selesaikan pembayaran</li>
+<li>Screenshot bukti pembayaran</li>
+<li>Isi form di sebelah lalu kirim konfirmasi</li>
+</ol>
+</div>
+</div>
+<div class="card rounded-2xl p-6">
+<h2 class="text-lg font-semibold text-white mb-1">Konfirmasi Pembayaran</h2>
+<p class="text-sm text-slate-400 mb-5">Isi data di bawah setelah transfer berhasil</p>
+<form id="depositForm" onsubmit="submitDeposit(event)" class="space-y-4">
+<div>
+<label class="block text-sm text-slate-400 mb-1.5">Nominal Deposit (Rp) <span class="text-red-400">*</span></label>
+<input type="number" id="depAmount" required min="10000" step="1000" placeholder="Contoh: 50000" class="w-full bg-slate-800 border border-slate-600 rounded-xl px-4 py-2.5 text-white"/>
+</div>
+<div>
+<label class="block text-sm text-slate-400 mb-1.5">Nomor WhatsApp Anda <span class="text-red-400">*</span></label>
+<input type="tel" id="depWhatsapp" required placeholder="08xxxxxxxxxx" class="w-full bg-slate-800 border border-slate-600 rounded-xl px-4 py-2.5 text-white"/>
+</div>
+<div>
+<label class="block text-sm text-slate-400 mb-1.5">Email Anda <span class="text-red-400">*</span></label>
+<input type="email" id="depEmail" required placeholder="email@contoh.com" class="w-full bg-slate-800 border border-slate-600 rounded-xl px-4 py-2.5 text-white"/>
+</div>
+<div>
+<label class="block text-sm text-slate-400 mb-1.5">Bank / E-Wallet Pengirim <span class="text-red-400">*</span></label>
+<select id="depBank" required class="w-full bg-slate-800 border border-slate-600 rounded-xl px-4 py-2.5 text-white">
+<option value="">-- Pilih --</option>
+<option value="DANA">DANA</option>
+<option value="OVO">OVO</option>
+<option value="GoPay">GoPay</option>
+<option value="ShopeePay">ShopeePay</option>
+<option value="LinkAja">LinkAja</option>
+<option value="BCA">BCA</option>
+<option value="BNI">BNI</option>
+<option value="BRI">BRI</option>
+<option value="Mandiri">Mandiri</option>
+<option value="SeaBank">SeaBank</option>
+<option value="Jago">Bank Jago</option>
+<option value="Lainnya">Lainnya</option>
+</select>
+</div>
+<div>
+<label class="block text-sm text-slate-400 mb-1.5">Screenshot Bukti Pembayaran <span class="text-red-400">*</span></label>
+<div class="border-2 border-dashed border-slate-600 rounded-xl p-4 text-center hover:border-sky-500 cursor-pointer" onclick="document.getElementById('depProof').click()">
+<input type="file" id="depProof" accept="image/*" required class="hidden" onchange="previewProof(this)"/>
+<div id="proofPreview">
+<p class="text-sm text-slate-400">Klik untuk upload screenshot</p>
+<p class="text-xs text-slate-500 mt-1">JPG, PNG (max 5MB)</p>
+</div>
+</div>
+</div>
+<div>
+<label class="block text-sm text-slate-400 mb-1.5">Catatan (opsional)</label>
+<textarea id="depNote" rows="2" placeholder="Contoh: transfer jam 20:15" class="w-full bg-slate-800 border border-slate-600 rounded-xl px-4 py-2.5 text-white resize-none"></textarea>
+</div>
+<button type="submit" id="btnSubmitDeposit" class="btn-success w-full py-3 rounded-xl font-semibold text-white">Kirim Konfirmasi Deposit</button>
+</form>
+<p class="text-xs text-slate-500 mt-4 text-center">Saldo ditambahkan manual setelah admin verifikasi (biasanya 5–30 menit).</p>
+</div>
+</div>
+</div>
+<div id="panel-orders" class="hidden space-y-4">
+<div class="flex justify-between items-center">
+<h2 class="text-lg font-semibold text-white">Pesanan Aktif</h2>
+<button onclick="loadActiveOrders()" class="text-sm text-sky-400">Refresh</button>
+</div>
+<div id="activeOrdersArea" class="space-y-3"><p class="text-slate-500 text-center py-10">Belum ada pesanan aktif</p></div>
+</div>
+<div id="panel-history" class="hidden space-y-4">
+<div class="flex justify-between items-center">
+<h2 class="text-lg font-semibold text-white">Riwayat Pesanan</h2>
+<button onclick="loadHistory()" class="text-sm text-sky-400">Refresh</button>
+</div>
+<div id="historyArea" class="space-y-3"><p class="text-slate-500 text-center py-10">Belum ada riwayat</p></div>
+</div>
+</main>
+<div id="orderModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+<div class="card rounded-2xl max-w-md w-full p-6 relative">
+<button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">×</button>
+<div id="modalContent"></div>
+</div>
+</div>
+<div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
+<div class="card rounded-xl px-5 py-3 shadow-2xl border border-slate-600 flex items-center gap-3 max-w-sm">
+<span id="toastIcon"></span>
+<span id="toastMsg" class="text-sm"></span>
+</div>
+</div>
+<script src="/app.js"></script>
+</body>
+</html>
